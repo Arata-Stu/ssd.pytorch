@@ -2,8 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-from layers import *
-from data import voc, coco
+## modification add path
+from .layers import *
+from .data.config import voc, coco, gen1
 import os
 
 
@@ -29,9 +30,15 @@ class SSD(nn.Module):
         super(SSD, self).__init__()
         self.phase = phase
         self.num_classes = num_classes
-        self.cfg = (coco, voc)[num_classes == 21]
+        self.cfg = gen1
         self.priorbox = PriorBox(self.cfg)
+        
+        ## modification
+        """
         self.priors = Variable(self.priorbox.forward(), volatile=True)
+        """
+        with torch.no_grad():
+            self.priors = Variable(self.priorbox.forward())
         self.size = size
 
         # SSD network
